@@ -7,14 +7,15 @@ import Downshift from "downshift";
 
 const useStyles = makeStyles((theme) => ({
   chip: {
-    margin: theme.spacing(0.5, 0.25)
-  }
+    margin: theme.spacing(0.5, 0.25),
+  },
 }));
 
 export default function TagsInput({ ...props }) {
   const classes = useStyles();
   const { selectedTags, placeholder, tags, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
+  const [errorEmail, setErrorEmail] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState([]);
   useEffect(() => {
     setSelectedItem(tags);
@@ -24,11 +25,23 @@ export default function TagsInput({ ...props }) {
   }, [selectedItem, selectedTags]);
 
   function handleKeyDown(event) {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" || event.keyCode === 9) {
+      console.log(inputValue.split(";"));
+      setInputValue(inputValue.split(";"));
       const newSelectedItem = [...selectedItem];
       const duplicatedValues = newSelectedItem.indexOf(
         event.target.value.trim()
       );
+      event.preventDefault();
+      if (
+        !inputValue.match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        )
+      ) {
+        setInputValue("");
+        setErrorEmail(true);
+        return;
+      }
 
       if (duplicatedValues !== -1) {
         setInputValue("");
@@ -36,7 +49,7 @@ export default function TagsInput({ ...props }) {
       }
       if (!event.target.value.replace(/\s/g, "").length) return;
 
-      newSelectedItem.push(event.target.value.trim());
+      newSelectedItem.push(...event.target.value.trim().split(";"));
       setSelectedItem(newSelectedItem);
       setInputValue("");
     }
@@ -64,6 +77,7 @@ export default function TagsInput({ ...props }) {
   };
 
   function handleInputChange(event) {
+    setErrorEmail(false);
     setInputValue(event.target.value);
   }
   return (
@@ -76,12 +90,17 @@ export default function TagsInput({ ...props }) {
         {({ getInputProps }) => {
           const { onBlur, onChange, onFocus, ...inputProps } = getInputProps({
             onKeyDown: handleKeyDown,
-            placeholder
+            placeholder,
           });
           return (
             <div>
               <TextField
+                error={errorEmail === true}
+                helperText={
+                  errorEmail === true ? "Digite um e-mail válido" : null
+                }
                 InputProps={{
+                  type: "email",
                   startAdornment: selectedItem.map((item) => (
                     <Chip
                       key={item}
@@ -96,7 +115,7 @@ export default function TagsInput({ ...props }) {
                     handleInputChange(event);
                     onChange(event);
                   },
-                  onFocus
+                  onFocus,
                 }}
                 {...other}
                 {...inputProps}
@@ -109,9 +128,9 @@ export default function TagsInput({ ...props }) {
   );
 }
 TagsInput.defaultProps = {
-  tags: []
+  tags: [],
 };
 TagsInput.propTypes = {
   selectedTags: PropTypes.func.isRequired,
-  tags: PropTypes.arrayOf(PropTypes.string)
+  tags: PropTypes.arrayOf(PropTypes.string),
 };
