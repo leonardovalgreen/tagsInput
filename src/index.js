@@ -14,8 +14,8 @@ function InputFieldWithChip() {
         variant="outlined"
         id="tags"
         name="tags"
-        placeholder="add Tags"
-        label="tags"
+        placeholder="add Email tags"
+        label="Email tags"
       />
     </div>
   );

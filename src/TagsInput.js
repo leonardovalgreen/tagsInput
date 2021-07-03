@@ -6,6 +6,15 @@ import TextField from "@material-ui/core/TextField";
 import Downshift from "downshift";
 
 const useStyles = makeStyles((theme) => ({
+  input: {
+    display: "flex",
+    width: "unset",
+  },
+  inputDiv: {
+    display: "flex",
+    flexWrap: "wrap",
+    padding: theme.spacing(0.2, 1),
+  },
   chip: {
     margin: theme.spacing(0.5, 0.25),
   },
@@ -25,31 +34,32 @@ export default function TagsInput({ ...props }) {
   }, [selectedItem, selectedTags]);
 
   function handleKeyDown(event) {
+    //abc@abx.sa;acb@asx.com
     if (event.key === "Enter" || event.keyCode === 9) {
-      console.log(inputValue.split(";"));
-      setInputValue(inputValue.split(";"));
       const newSelectedItem = [...selectedItem];
       const duplicatedValues = newSelectedItem.indexOf(
-        event.target.value.trim()
+        event.target.value.trim().split(";")
       );
+
       event.preventDefault();
-      if (
-        !inputValue.match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        )
-      ) {
-        setInputValue("");
-        setErrorEmail(true);
-        return;
-      }
+      console.log(newSelectedItem);
+      console.log(duplicatedValues);
 
       if (duplicatedValues !== -1) {
         setInputValue("");
         return;
       }
       if (!event.target.value.replace(/\s/g, "").length) return;
-
-      newSelectedItem.push(...event.target.value.trim().split(";"));
+      event.target.value
+        .trim()
+        .split(";")
+        .map((data) => {
+          return !data.match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          ) || newSelectedItem.indexOf(data) !== -1
+            ? setErrorEmail(true)
+            : newSelectedItem.push(data);
+        });
       setSelectedItem(newSelectedItem);
       setInputValue("");
     }
@@ -58,6 +68,7 @@ export default function TagsInput({ ...props }) {
       !inputValue.length &&
       event.key === "Backspace"
     ) {
+      setErrorEmail(false);
       setSelectedItem(selectedItem.slice(0, selectedItem.length - 1));
     }
   }
@@ -97,10 +108,17 @@ export default function TagsInput({ ...props }) {
               <TextField
                 error={errorEmail === true}
                 helperText={
-                  errorEmail === true ? "Digite um e-mail válido" : null
+                  errorEmail === true
+                    ? "Pelo menos um e-mail digitado é inválido"
+                    : null
                 }
-                InputProps={{
+                inputProps={{
+                  className: classes.input,
                   type: "email",
+                  size: inputValue.length,
+                }}
+                InputProps={{
+                  className: classes.inputDiv,
                   startAdornment: selectedItem.map((item) => (
                     <Chip
                       key={item}
