@@ -41,9 +41,6 @@ export default function TagsInput({ ...props }) {
   useEffect(() => {
     setSelectedItem(tags);
   }, [tags]);
-  useEffect(() => {
-    selectedTags(selectedItem.join(" - "));
-  }, [selectedItem, selectedTags]);
 
   function handleKeyDown(event) {
     //abc@abx.sa;acb@asx.com
