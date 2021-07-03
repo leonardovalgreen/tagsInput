@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
+import Button from "@material-ui/core/Button";
 import Chip from "@material-ui/core/Chip";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -18,6 +19,12 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     margin: theme.spacing(0.5, 0.25),
   },
+  button: {
+    margin: theme.spacing(1, 0),
+  },
+  span: {
+    margin: theme.spacing(0, 2),
+  },
 }));
 
 export default function TagsInput({ ...props }) {
@@ -25,12 +32,17 @@ export default function TagsInput({ ...props }) {
   const { selectedTags, placeholder, tags, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
   const [errorEmail, setErrorEmail] = React.useState(false);
+  const [errorDuplicated, setErrorDuplicated] = React.useState(false);
+  const [theDisplay, setTheDisplay] = React.useState("none");
+  const [btnText, setBtnText] = React.useState("mostrar array de tags");
   const [selectedItem, setSelectedItem] = React.useState([]);
+  const mailRegex =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   useEffect(() => {
     setSelectedItem(tags);
   }, [tags]);
   useEffect(() => {
-    selectedTags(selectedItem);
+    selectedTags(selectedItem.join(" - "));
   }, [selectedItem, selectedTags]);
 
   function handleKeyDown(event) {
@@ -54,10 +66,10 @@ export default function TagsInput({ ...props }) {
         .trim()
         .split(";")
         .map((data) => {
-          return !data.match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          ) || newSelectedItem.indexOf(data) !== -1
+          return !data.match(mailRegex)
             ? setErrorEmail(true)
+            : newSelectedItem.indexOf(data) !== -1
+            ? setErrorDuplicated(true)
             : newSelectedItem.push(data);
         });
       setSelectedItem(newSelectedItem);
@@ -91,6 +103,24 @@ export default function TagsInput({ ...props }) {
     setErrorEmail(false);
     setInputValue(event.target.value);
   }
+
+  const handleShow = () => {
+    setTheDisplay(
+      theDisplay === "none"
+        ? "flex"
+        : theDisplay === "flex"
+        ? "none"
+        : theDisplay
+    );
+    setBtnText(
+      btnText === "mostrar array de tags"
+        ? "esconder array de tags"
+        : btnText === "esconder array de tags"
+        ? "mostrar array de tags"
+        : btnText
+    );
+  };
+
   return (
     <React.Fragment>
       <Downshift
@@ -106,10 +136,14 @@ export default function TagsInput({ ...props }) {
           return (
             <div>
               <TextField
-                error={errorEmail === true}
+                error={errorEmail === true || errorDuplicated === true}
                 helperText={
-                  errorEmail === true
+                  errorEmail === true && errorDuplicated === false
                     ? "Pelo menos um e-mail digitado é inválido"
+                    : errorDuplicated === true && errorEmail === false
+                    ? "Pelo menos um e-mail digitado já existe"
+                    : errorDuplicated === true && errorEmail === true
+                    ? "Pelo menos um e-mail digitado já existe e pelo menos um outro e-mail é inválido"
                     : null
                 }
                 inputProps={{
@@ -142,6 +176,17 @@ export default function TagsInput({ ...props }) {
           );
         }}
       </Downshift>
+      <Button
+        color="primary"
+        variant="contained"
+        className={classes.button}
+        onClick={handleShow}
+      >
+        {btnText}
+      </Button>
+      <span className={classes.span} style={{ display: theDisplay }}>
+        {selectedItem.join(" - ")}
+      </span>
     </React.Fragment>
   );
 }
