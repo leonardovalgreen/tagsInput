@@ -79,14 +79,6 @@ export default function TagsInput({ ...props }) {
       setSelectedItem(selectedItem.slice(0, selectedItem.length - 1));
     }
   }
-  // function handleChange(item) {
-  //   let newSelectedItem = [...selectedItem];
-  //   if (newSelectedItem.indexOf(item) === -1) {
-  //     newSelectedItem = [...newSelectedItem, item];
-  //   }
-  //   setInputValue("");
-  //   setSelectedItem(newSelectedItem);
-  // }
 
   const handleDelete = (item) => () => {
     const newSelectedItem = [...selectedItem];
