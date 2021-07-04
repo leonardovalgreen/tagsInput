@@ -36,7 +36,7 @@ describe("TagsInput component", () => {
     fireEvent.keyDown(field, { key: "Backspace", code: 8, charCode: 8 });
     fireEvent.blur(field);
     // o teste deverá quebrar se o último elemento
-    // não tiver sido deletado
+    // não tiver sido deletado e se o primeiro elemento for inválido
     screen.getAllByText("teste1@teste.com");
     expect(screen.queryByText("teste2@teste.com")).toBeNull();
   });

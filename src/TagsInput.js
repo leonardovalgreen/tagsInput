@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function TagsInput({ ...props }) {
   const classes = useStyles();
-  const { selectedTags, placeholder, tags, ...other } = props;
+  const { placeholder, tags, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
   const [errorEmail, setErrorEmail] = React.useState(false);
   const [errorDuplicated, setErrorDuplicated] = React.useState(false);
@@ -43,7 +43,7 @@ export default function TagsInput({ ...props }) {
   }, [tags]);
 
   function handleKeyDown(event) {
-    //abc@abx.sa;acb@asx.com
+    //Array de e-mails para teste: abc@abx.sa;acb@asx.com;sdkosso@sdw.br;sodkwiiii@iii.br;sssoo@kaiw.us;teps@tops.mega
     if (event.key === "Enter" || event.keyCode === 9) {
       const newSelectedItem = [...selectedItem];
       const duplicatedValues = newSelectedItem.indexOf(
@@ -51,8 +51,6 @@ export default function TagsInput({ ...props }) {
       );
 
       event.preventDefault();
-      console.log(newSelectedItem);
-      console.log(duplicatedValues);
 
       if (duplicatedValues !== -1) {
         setInputValue("");
@@ -138,9 +136,9 @@ export default function TagsInput({ ...props }) {
                   errorEmail === true && errorDuplicated === false
                     ? "Pelo menos um e-mail digitado é inválido"
                     : errorDuplicated === true && errorEmail === false
-                    ? "Pelo menos um e-mail digitado já existe"
+                    ? "Pelo menos um e-mail digitado já é uma tag"
                     : errorDuplicated === true && errorEmail === true
-                    ? "Pelo menos um e-mail digitado já existe e pelo menos um outro e-mail é inválido"
+                    ? "Pelo menos um e-mail digitado já é uma tag e pelo menos um outro e-mail é inválido"
                     : null
                 }
                 inputProps={{
@@ -191,6 +189,5 @@ TagsInput.defaultProps = {
   tags: [],
 };
 TagsInput.propTypes = {
-  selectedTags: PropTypes.func.isRequired,
   tags: PropTypes.arrayOf(PropTypes.string),
 };
