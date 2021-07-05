@@ -79,6 +79,7 @@ export default function TagsInput({ ...props }) {
   };
 
   function handleInputChange(event) {
+    setErrorDuplicated(false);
     setErrorEmail(false);
     setInputValue(event.target.value);
   }
