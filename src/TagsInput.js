@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function TagsInput({ ...props }) {
   const classes = useStyles();
-  const { placeholder, tags, selectedTags, ...other } = props;
+  const { placeholder, tags, saveArray, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
   const [errorEmail, setErrorEmail] = React.useState(false);
   const [errorDuplicated, setErrorDuplicated] = React.useState(false);
@@ -32,9 +32,6 @@ export default function TagsInput({ ...props }) {
   useEffect(() => {
     setSelectedItem(tags);
   }, [tags]);
-  useEffect(() => {
-    selectedTags(selectedItem.join(" - "));
-  }, [selectedItem, selectedTags]);
 
   function handleKeyDown(event) {
     //Array de e-mails para teste: abc@abx.sa;acb@asx.com;sdkosso@sdw.br;sodkwiiii@iii.br;sssoo@kaiw.us;teps@tops.mega
@@ -100,6 +97,7 @@ export default function TagsInput({ ...props }) {
           return (
             <div>
               <TextField
+                onKeyDown={props.saveArray(selectedItem.join(" - "))}
                 error={errorEmail === true || errorDuplicated === true}
                 helperText={
                   errorEmail === true && errorDuplicated === false
@@ -147,6 +145,6 @@ TagsInput.defaultProps = {
   tags: [],
 };
 TagsInput.propTypes = {
-  selectedTags: PropTypes.func.isRequired,
   tags: PropTypes.arrayOf(PropTypes.string),
+  saveArray: PropTypes.func.isRequired,
 };
