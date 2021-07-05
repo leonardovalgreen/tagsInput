@@ -4,6 +4,7 @@ import Chip from "@material-ui/core/Chip";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Downshift from "downshift";
+import ButtonArray from "./ButtonArray";
 
 const useStyles = makeStyles((theme) => ({
   input: {
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function TagsInput({ ...props }) {
   const classes = useStyles();
-  const { placeholder, tags, saveArray, ...other } = props;
+  const { placeholder, tags, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
   const [errorEmail, setErrorEmail] = React.useState(false);
   const [errorDuplicated, setErrorDuplicated] = React.useState(false);
@@ -97,7 +98,6 @@ export default function TagsInput({ ...props }) {
           return (
             <div>
               <TextField
-                onKeyDown={props.saveArray(selectedItem.join(" - "))}
                 error={errorEmail === true || errorDuplicated === true}
                 helperText={
                   errorEmail === true && errorDuplicated === false
@@ -134,6 +134,21 @@ export default function TagsInput({ ...props }) {
                 {...other}
                 {...inputProps}
               />
+              <ButtonArray
+                textProps={{
+                  style: { fontWeight: "500", fontFamily: "sans-serif" },
+                  props: {
+                    id: "result",
+                  },
+                }}
+                buttonProps={{
+                  style: { background: "tomato" },
+                  id: "btnShow",
+                  variant: "contained",
+                }}
+              >
+                {selectedItem.join(" - ")}
+              </ButtonArray>
             </div>
           );
         }}
@@ -146,5 +161,4 @@ TagsInput.defaultProps = {
 };
 TagsInput.propTypes = {
   tags: PropTypes.arrayOf(PropTypes.string),
-  saveArray: PropTypes.func.isRequired,
 };
