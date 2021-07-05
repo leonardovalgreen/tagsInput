@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import Button from "@material-ui/core/Button";
 import Chip from "@material-ui/core/Chip";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -19,28 +18,23 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     margin: theme.spacing(0.5, 0.25),
   },
-  button: {
-    margin: theme.spacing(1, 0),
-  },
-  span: {
-    margin: theme.spacing(0, 2),
-  },
 }));
 
 export default function TagsInput({ ...props }) {
   const classes = useStyles();
-  const { placeholder, tags, ...other } = props;
+  const { placeholder, tags, selectedTags, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
   const [errorEmail, setErrorEmail] = React.useState(false);
   const [errorDuplicated, setErrorDuplicated] = React.useState(false);
-  const [theDisplay, setTheDisplay] = React.useState("none");
-  const [btnText, setBtnText] = React.useState("mostrar array de tags");
   const [selectedItem, setSelectedItem] = React.useState([]);
   const mailRegex =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   useEffect(() => {
     setSelectedItem(tags);
   }, [tags]);
+  useEffect(() => {
+    selectedTags(selectedItem.join(" - "));
+  }, [selectedItem, selectedTags]);
 
   function handleKeyDown(event) {
     //Array de e-mails para teste: abc@abx.sa;acb@asx.com;sdkosso@sdw.br;sodkwiiii@iii.br;sssoo@kaiw.us;teps@tops.mega
@@ -90,23 +84,6 @@ export default function TagsInput({ ...props }) {
     setErrorEmail(false);
     setInputValue(event.target.value);
   }
-
-  const handleShow = () => {
-    setTheDisplay(
-      theDisplay === "none"
-        ? "flex"
-        : theDisplay === "flex"
-        ? "none"
-        : theDisplay
-    );
-    setBtnText(
-      btnText === "mostrar array de tags"
-        ? "esconder array de tags"
-        : btnText === "esconder array de tags"
-        ? "mostrar array de tags"
-        : btnText
-    );
-  };
 
   return (
     <React.Fragment>
@@ -163,17 +140,6 @@ export default function TagsInput({ ...props }) {
           );
         }}
       </Downshift>
-      <Button
-        color="primary"
-        variant="contained"
-        className={classes.button}
-        onClick={handleShow}
-      >
-        {btnText}
-      </Button>
-      <span className={classes.span} style={{ display: theDisplay }}>
-        {selectedItem.join(" - ")}
-      </span>
     </React.Fragment>
   );
 }
@@ -181,5 +147,6 @@ TagsInput.defaultProps = {
   tags: [],
 };
 TagsInput.propTypes = {
+  selectedTags: PropTypes.func.isRequired,
   tags: PropTypes.arrayOf(PropTypes.string),
 };
